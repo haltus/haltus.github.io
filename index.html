@@ -1,442 +1,614 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Матричное поздравление</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Consolas', 'Courier New', monospace;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        
-        #matrixCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        
-        .greeting-container {
-            text-align: center;
-            padding: 15px 20px;
-            max-width: 90%;
-            max-height: 90vh;
-            z-index: 2;
-            background: rgba(0, 0, 0, 0.97);
-            border: 1px solid #0f0;
-            border-radius: 3px;
-            position: relative;
-            box-shadow: 
-                0 0 20px rgba(0, 255, 0, 0.6),
-                inset 0 0 15px rgba(0, 255, 0, 0.25);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .greeting-lines {
-            position: relative;
-            overflow: visible;
-        }
-        
-        .greeting-line {
-            margin: 8px 0;
-            text-align: center;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            line-height: 1.3;
-        }
-        
-        .char {
-            font-size: 1.8em; /* Уменьшенный базовый размер */
-            color: #0ffa0f;
-            text-shadow: 
-                0 0 8px #0f0,
-                0 0 15px rgba(0, 255, 0, 0.8);
-            font-weight: bold;
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: appear 0.4s forwards;
-            white-space: nowrap;
-        }
-        
-        .space-char {
-            display: inline-block;
-            min-width: 0.4em;
-            font-size: 1.8em;
-        }
-        
-        @keyframes appear {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .glitch {
-            animation: glitch 0.3s linear 3;
-            text-shadow: 
-                0 0 8px #0f0, 
-                3px 0 0 #f00, 
-                -3px 0 0 #00f;
-        }
-        
-        @keyframes glitch {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-3px); }
-            40% { transform: translateX(3px); }
-            60% { transform: translateX(-3px); }
-            80% { transform: translateX(3px); }
-            100% { transform: translateX(0); }
-        }
-        
-        .neon-border {
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            border: 1px solid #0f0;
-            border-radius: 3px;
-            box-shadow: 
-                0 0 10px rgba(0, 255, 0, 0.5),
-                inset 0 0 10px rgba(0, 255, 0, 0.3);
-            pointer-events: none;
-            animation: neon-pulse 2s infinite alternate;
-        }
-        
-        @keyframes neon-pulse {
-            0% {
-                box-shadow: 
-                    0 0 8px rgba(0, 255, 0, 0.3),
-                    inset 0 0 8px rgba(0, 255, 0, 0.2);
-            }
-            100% {
-                boxShadow: 
-                    0 0 20px rgba(0, 255, 0, 0.7),
-                    inset 0 0 20px rgba(0, 255, 0, 0.5);
-            }
-        }
-        
-        .matrix-digit {
-            position: absolute;
-            color: rgba(0, 255, 0, 0.7);
-            font-size: 14px;
-            opacity: 0;
-            animation: fall 10s linear forwards;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
-            z-index: -1;
-        }
-        
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-                opacity: 0;
-            }
-        }
-        
-        /* Адаптация для мобильных устройств */
-        @media (orientation: portrait) and (max-width: 768px) {
-            .char {
-                font-size: 1.4em; /* Еще меньше для портретного режима */
-            }
-            
-            .space-char {
-                font-size: 1.4em;
-            }
-            
-            .greeting-container {
-                padding: 10px 15px;
-                max-width: 95%;
-                border-width: 1px;
-            }
-            
-            .greeting-line {
-                margin: 6px 0;
-            }
-            
-            .neon-border {
-                border-width: 1px;
-            }
-        }
-        
-        @media (orientation: landscape) and (max-height: 480px) {
-            .char {
-                font-size: 1.4em;
-            }
-            
-            .space-char {
-                font-size: 1.4em;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .greeting-container {
-                padding: 8px 12px;
-            }
-            
-            .char {
-                font-size: 1.2em; /* Минимальный размер для маленьких экранов */
-            }
-            
-            .space-char {
-                font-size: 1.2em;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>WhatsApp-подобный чат + сценарий (реалистичные задержки)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+      gap: 20px;
+    }
+    .container {
+      flex: 1;
+      max-width: 400px;
+      height: 700px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background-color: #00a884;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .header-icon {
+      width: 30px;
+      height: 30px;
+      background-color: #005c4b;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+    .header-title {
+      font-weight: 500;
+    }
+    .header-subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 1px;
+    }
+
+    .chat {
+      flex: 1;
+      padding: 10px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      /* скрыть полосу прокрутки */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth; /* плавная прокрутка */
+    }
+    .chat::-webkit-scrollbar {
+      display: none;
+    }
+    .chat::-webkit-scrollbar {
+      display: none;
+    }
+
+.system-message {
+  text-align: center;
+  font-size: 12px;
+  color: #54656f;
+  margin: 2px 0;   /* было 10px → 2px */
+  padding: 0;
+}
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: 75%;
+      margin-bottom: 3px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: messageAppear 0.35s ease-out forwards;
+    }
+    .message.own {
+      margin-left: auto;
+      align-items: flex-end;
+    }
+
+    @keyframes messageAppear {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message-info {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #54656f;
+      margin-bottom: 2px;
+    }
+    .message-name {
+      font-weight: 500;
+    }
+    .message-time {
+      font-size: 11px;
+      color: #8696a0;
+    }
+
+    .message-content {
+      padding: 8px 12px;
+      border-radius: 15px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .message.incoming .message-content {
+      background-color: #f0f0f0;
+      color: #000000;
+      border-top-left-radius: 0;
+    }
+    .message.own .message-content {
+      background-color: #00a884;
+      color: #ffffff;
+      border-top-right-radius: 0;
+    }
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background-color: #f0f2f5;
+      border-top: 1px solid #e3e3e3;
+    }
+    .input-area button {
+      background: none;
+      border: none;
+      color: #54656f;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .input-area button:hover {
+      color: #00a884;
+    }
+    .input-area input {
+      flex: 1;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 18px;
+      border: 1px solid #ddd;
+      outline: none;
+      font-size: 14px;
+      background-color: white;
+    }
+
+    .typing-indicator {
+      margin-top: 4px;
+      padding: 4px 10px;
+      background-color: #f0f0f0;
+      border-radius: 16px;
+      font-size: 12px;
+      color: #54656f;
+      align-self: flex-start;
+      display: inline-block;
+    }
+
+    .typing-dots span {
+      opacity: 0;
+      animation: blink 1.4s infinite both;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: 0s; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 20% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .script-area {
+      flex: 1;
+      max-width: 350px;
+      height: 700px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .script-header {
+      padding: 10px 12px;
+      background-color: #f0f2f5;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .script-content {
+      flex: 1;
+      padding: 10px;
+      resize: none;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      border: none;
+      background: #ffffff;
+      outline: none;
+    }
+    .script-controls {
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+      background-color: #f0f2f5;
+      border-top: 1px solid #e0e0e0;
+    }
+    .script-controls button {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      background-color: #00a884;
+      color: white;
+      cursor: pointer;
+    }
+    .script-controls button:hover {
+      background-color: #008c70;
+    }
+    .script-controls button.restart {
+      background-color: #ff6b6b;
+    }
+    .script-controls button.restart:hover {
+      background-color: #e64949;
+    }
+    .script-controls button.clear {
+      background-color: #adb5bd;
+    }
+    .script-controls button.clear:hover {
+      background-color: #90a4ae;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="matrixCanvas"></canvas>
-    
-    <div class="greeting-container">
-        <div class="neon-border"></div>
-        <div class="greeting-lines" id="greeting"></div>
+  <!-- Левая часть — чат -->
+  <div class="container" id="mainContainer">
+    <div class="header">
+      <div class="header-icon">💬</div>
+      <div>
+        <div class="header-title">Выпускной 1579</div>
+        <div class="header-subtitle">13 участников</div>
+      </div>
     </div>
 
-    <script>
-        // Поздравительный текст с поддержкой нескольких строк
-        const greetingText = `С днём рождения, Максим!
-Пусть всё получается хорошо
-А плохо не получается!`;
+    <div class="chat" id="chat">
+      <!-- Сообщения будут добавляться сюда -->
+    </div>
 
-        const greetingContainer = document.getElementById('greeting');
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Массив для падающих символов
-        const matrixChars = "0101010101010アカサタナハマヤラワАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
-        
-        // Настройки матричного эффекта
-        const fontSize = 14; /* Уменьшенный размер для фона */
-        let columns = 0;
-        let drops = [];
-        
-        // Размеры canvas
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            columns = Math.floor(canvas.width / fontSize);
-            drops = Array(columns).fill(1);
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        
-        // Отрисовка матричного эффекта
-        function drawMatrix() {
-            // Слегка темный фон для эффекта шлейфа
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Разные оттенки зеленого для глубины
-            const hue = 120; // зелёный
-    
-            // Перебираем каждую колонку
-            for (let i = 0; i < drops.length; i++) {
-                // Выбираем случайный символ
-                const char = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
-                
-                // Начальные символы более яркие
-                const light = drops[i] === 1 ? 80 + Math.random() * 20 : 35;
-                ctx.fillStyle = `hsl(${hue}, 100%, ${light}%)`;
-                
-                // Рисуем символ
-                ctx.font = `bold ${fontSize}px 'Courier New', monospace`;
-                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                
-                // Сброс колонки с вероятностью
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
-                    drops[i] = 0;
-                }
-                
-                drops[i]++;
-            }
-        }
-        
-        // Добавление плавающих символов вокруг контейнера
-        function addFloatingDigits() {
-            const container = document.querySelector('.greeting-container');
-            if (!container) return;
-            
-            const rect = container.getBoundingClientRect();
-            const count = window.innerWidth < 768 ? 4 : 6;
-            
-            for (let i = 0; i < count; i++) {
-                const digit = document.createElement('div');
-                digit.className = 'matrix-digit';
-                digit.textContent = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
-                
-                // Позиционирование вокруг контейнера
-                const side = Math.floor(Math.random() * 4);
-                const posX = Math.floor(Math.random() * rect.width);
-                const posY = Math.floor(Math.random() * rect.height);
-                
-                let startX, startY;
-                switch(side) {
-                    case 0: // top
-                        startX = rect.left + posX;
-                        startY = rect.top - 30;
-                        break;
-                    case 1: // right
-                        startX = rect.right + 30;
-                        startY = rect.top + posY;
-                        break;
-                    case 2: // bottom
-                        startX = rect.left + posX;
-                        startY = rect.bottom + 30;
-                        break;
-                    case 3: // left
-                        startX = rect.left - 30;
-                        startY = rect.top + posY;
-                        break;
-                }
-                
-                digit.style.left = startX + 'px';
-                digit.style.top = startY + 'px';
-                digit.style.animationDuration = (Math.random() * 8 + 5) + 's';
-                
-                document.body.appendChild(digit);
-                
-                // Удаляем элемент после завершения анимации
-                setTimeout(() => {
-                    digit.remove();
-                }, 10000);
-            }
-        }
-        
-        // Постепенный вывод текста с поддержкой нескольких строк
-        function typeText() {
-            greetingContainer.innerHTML = '';
-            
-            // Разделяем текст на строки
-            const lines = greetingText.split('\n');
-            let currentLineIndex = 0;
-            let currentCharIndex = 0;
-            
-            // Создаем элементы для строк
-            const lineElements = [];
-            for (let i = 0; i < lines.length; i++) {
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'greeting-line';
-                greetingContainer.appendChild(lineDiv);
-                lineElements.push(lineDiv);
-            }
-            
-            function addChar() {
-                if (currentLineIndex < lines.length) {
-                    const currentLine = lines[currentLineIndex];
-                    const lineElement = lineElements[currentLineIndex];
-                    
-                    if (currentCharIndex < currentLine.length) {
-                        const char = currentLine.charAt(currentCharIndex);
-                        
-                        if (char === ' ') {
-                            const spaceSpan = document.createElement('span');
-                            spaceSpan.innerHTML = '&nbsp;';
-                            spaceSpan.className = 'space-char';
-                            lineElement.appendChild(spaceSpan);
-                        } else {
-                            const span = document.createElement('span');
-                            span.textContent = char;
-                            span.className = 'char';
-                            
-                            // Случайные глитчи
-                            if (Math.random() > 0.92) {
-                                span.classList.add('glitch');
-                                setTimeout(() => span.classList.remove('glitch'), 200);
-                            }
-                            
-                            lineElement.appendChild(span);
-                        }
-                        
-                        currentCharIndex++;
-                        setTimeout(addChar, 40 + Math.random() * 30);
-                    } else {
-                        // Переход к следующей строке
-                        currentLineIndex++;
-                        currentCharIndex = 0;
-                        setTimeout(addChar, 180); // Пауза между строками
-                    }
-                } else {
-                    // Эффекты завершения
-                    setTimeout(() => {
-                        // Интенсивное мерцание рамки
-                        const border = document.querySelector('.neon-border');
-                        if (border) {
-                            border.style.animation = 'neon-pulse 0.3s infinite';
-                        }
-                        
-                        // Создаем эффект "взлома"
-                        let flashCount = 0;
-                        const maxFlashes = window.innerWidth < 768 ? 8 : 12;
-                        
-                        const flash = setInterval(() => {
-                            if (border) {
-                                // Случайное изменение цвета рамки
-                                const colors = ['#0f0', '#f00', '#00f', '#ff0'];
-                                const color = colors[Math.floor(Math.random() * colors.length)];
-                                border.style.borderColor = color;
-                                border.style.boxShadow = `0 0 15px ${color}, inset 0 0 12px ${color}`;
-                            }
-                            
-                            // Генерация символов вокруг
-                            if (flashCount % 3 === 0) {
-                                addFloatingDigits();
-                            }
-                            
-                            if (++flashCount >= maxFlashes) {
-                                clearInterval(flash);
-                                setTimeout(() => {
-                                    if (border) {
-                                        // Возвращаем нормальный вид
-                                        border.style.borderColor = '#0f0';
-                                        border.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.5), inset 0 0 10px rgba(0, 255, 0, 0.3)';
-                                        border.style.animation = 'neon-pulse 2s infinite alternate';
-                                    }
-                                    
-                                    // Продолжаем редкую генерацию символов
-                                    setInterval(addFloatingDigits, 2000);
-                                }, 500);
-                            }
-                        }, 100);
-                    }, 700);
-                }
-            }
-            
-            addChar();
-        }
+    <div class="input-area">
+      <input type="text" placeholder="Сообщение" id="messageInput" />
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
 
-        // Запуск при загрузке страницы
-        window.addEventListener('load', () => {
-            resizeCanvas();
-            setInterval(drawMatrix, 50);
-            setTimeout(typeText, 300);
-            // Генерация символов каждые 1.5 секунд
-            setInterval(addFloatingDigits, 1500);
-        });
-        
-        window.addEventListener('resize', resizeCanvas);
-    </script>
+  <!-- Правая часть — сценарий сообщений -->
+  <div class="script-area">
+    <div class="script-header">Сценарий сообщений (Имя: Текст)</div>
+    <textarea id="scenarioInput" class="script-content">
+10|СИСТЕМА: Мама Аркадия создала чат "Выпускной 1579"
+2000|Мама Аркадия: Уважаемые родители! Это время пришло! Нам нужен номер на выпускной от родителей!
+2000|Мама Саши: Опять деньги сдавать🤪
+2000|ПЕЧАТЬ: Папа Андрея
+500|Мама Аркадия: Да! Но не это страшно 😎
+2000|Папа Насти: Напугайте меня
+2000|Мама Егора: А что страшно?
+2000|Папа Вани: Я готов на все!!!
+2000|Мама Аркадия: Надо спеть и станцевать 😆
+2000|СИСТЕМА: Папа Вани покинул чат
+5000|СИСТЕМА: Мама добавила папу Вани
+2000|Папа Андрея: Кому надо?
+2000|Мама Аркадия: Вам родители 
+500|СИСТЕМА: Папа Андрея покинул чат
+100|СИСТЕМА: Папа Егора покинул чат 
+100|СИСТЕМА: Папа Леши покинул чат
+100|СИСТЕМА: Папа Миши покинул чат 
+2000|Папа Насти: Слабаки😎
+2000|Мама Леши добавила папу Леши
+2000|Мама Юли: А есть варианты без песни и танцев
+2000|СИСТЕМА: Мама Андрея добавила папу Андрея
+1000|СИСТЕМА: Мама Егора добавила папу Егора
+1000|СИСТЕМА: Мама Миши добавила папу Миши
+2000|Папа Насти: 😎
+2000|Мама Аркадия: Без вариантов🤷🏻‍♂️
+2000|Мама Аркадия: Итак, собираем по 20.000
+2000|Папа Вани: Как-то у вас тут все сложно
+2000|СИСТЕМА: Папа Вани покинул чат
+2000|Папа Андрея: А че так много?
+2000|Мама Леши: Это на видеооператора, реквизит и студию звукозаписи 
+2000|Папа Миши: Это понятно. А остальные 19 тыщ куда?
+2000|Мама Вани: Очень смешно 😡
+2000|СИСТЕМА: Мама Вани добавила папу Вани
+2000|Мама Егора: На репетицию 🎸🍿🍾
+2000|Папа Андрея: Ок. Сколько бутылок брать?
+2000|Папа Андрея: Ой. Не туда
+2000|Папа Андрея: А нет. Все понятно, туда
+2000|Папа Вани: Вот теперь меня везде пишите🍺
+2000|Папа Паши: А я здесь зачем?
+2000|Мама Саши: Танцевать будете👏🏻
+2000|Папа Леши: Я не могу, я работаю 
+2000|Папа Насти: Ага, а мы тут все безработные?!
+2000|Мама Аркадия: Встречаемся на бульваре у школы
+2000|Папа Егора: А это обязательно? Может только скинемся?
+2000|Мама Егора: Не обсуждается! Мы там и скинемся, и споемся, и станцуемся!
+2000|Мама Аркадия: Через час все на бульвар у школы!
+    </textarea>
+    <div class="script-controls">
+      <button id="runBtn">► Запустить</button>
+      <button id="restartBtn" class="restart">⟳ Перезапустить</button>
+      <button id="clearBtn" class="clear">× Очистить чат</button>
+    </div>
+  </div>
+
+  <!-- Два звука -->
+  <audio id="userSound" preload="auto"></audio>
+  <audio id="systemSound" preload="auto"></audio>
+
+  <script>
+    const chatEl = document.getElementById("chat");
+    const inputEl = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    const scenarioInput = document.getElementById("scenarioInput");
+    const runBtn = document.getElementById("runBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const userSoundEl = document.getElementById("userSound");
+    const systemSoundEl = document.getElementById("systemSound");
+
+    const mainContainer = document.getElementById("mainContainer");
+
+    let userInteractionDone = false;
+
+    function initSounds() {
+      if (userInteractionDone) return;
+      userInteractionDone = true;
+
+      // Примеры локальных звуков (поменяй на свои файлы при необходимости)
+      userSoundEl.src = "message_user.mp3";     // звук обычного сообщения
+      systemSoundEl.src = "message_system.mp3"; // звук системного сообщения
+    }
+
+    function playUserSound() {
+      if (!userSoundEl.src) return;
+      userSoundEl.currentTime = 0;
+      userSoundEl.play().catch(() => {});
+    }
+    function playSystemSound() {
+      if (!systemSoundEl.src) return;
+      systemSoundEl.currentTime = 0;
+      systemSoundEl.play().catch(() => {});
+    }
+
+    // Список участников
+    const members = [
+      { id: 1, name: "Анна", isYou: false },
+      { id: 2, name: "Артём", isYou: false },
+      { id: 3, name: "Мама Аркадия", isYou: true },
+      { id: 4, name: "Иван", isYou: false },
+      { id: 5, name: "Елена", isYou: false },
+    ];
+
+    const you = members.find(m => m.isYou);
+
+    function now() {
+      const pad = n => (n < 10 ? "0" : "") + n;
+      const d = new Date();
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function scrollToBottom() {
+      chatEl.scrollTo({
+        top: chatEl.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+
+    function clearChat() {
+      chatEl.innerHTML = "";
+      scrollToBottom();
+    }
+
+    function appendMessage(name, text, isOwn = false, type = "regular") {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${isOwn ? "own" : "incoming"}`;
+
+      if (type === "system") {
+        const sysDiv = document.createElement("div");
+        sysDiv.className = "system-message";
+        sysDiv.textContent = text;
+        chatEl.appendChild(sysDiv);
+        scrollToBottom();
+        if (userInteractionDone) playSystemSound();
+        return;
+      }
+
+      const info = document.createElement("div");
+      info.className = "message-info";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "message-name";
+      nameSpan.textContent = name;
+
+      info.appendChild(nameSpan);
+
+      const time = document.createElement("span");
+      time.className = "message-time";
+      time.textContent = now();
+
+      info.appendChild(time);
+
+      const content = document.createElement("div");
+      content.className = "message-content";
+      content.textContent = text;
+
+      msgDiv.appendChild(info);
+      msgDiv.appendChild(content);
+
+      chatEl.appendChild(msgDiv);
+      scrollToBottom();
+      if (userInteractionDone) playUserSound();
+    }
+
+    function delayFromLength(text, isSystem = false) {
+      const baseDelay = isSystem ? 300 : 800;  // системные быстрее
+      const coef = isSystem ? 0.1 : 0.3;       // чем дольше текст — тем больше пауза
+      const delay = baseDelay + text.length * coef * 100;
+      return Math.min(delay, 4000); // max 4 сек, чтобы не залипать
+    }
+
+function startScenario() {
+  clearChat();
+  const lines = scenarioInput.value.trim().split(/\r?\n/).filter(line => line.trim() !== "");
+  let index = 0;
+  const typingMap = new Map();
+
+  function removeTyping(user) {
+    const typingKey = "typing_" + user;
+    const el = typingMap.get(typingKey);
+    if (el && el.parentNode) {
+      el.parentNode.removeChild(el);
+      typingMap.delete(typingKey);
+    }
+  }
+
+  function addTyping(user) {
+    removeTyping(user);
+
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "message typing incoming";
+
+    const info = document.createElement("div");
+    info.className = "message-info";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "message-name";
+    nameSpan.textContent = user;
+
+    info.appendChild(nameSpan);
+
+    const time = document.createElement("span");
+    time.className = "message-time";
+    time.textContent = now();
+
+    info.appendChild(time);
+
+    const content = document.createElement("div");
+    content.className = "typing-indicator";
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = " печатает";
+    content.appendChild(textSpan);
+
+    const dots = document.createElement("span");
+    dots.className = "typing-dots";
+    dots.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+    content.appendChild(dots);
+
+    msgDiv.appendChild(info);
+    msgDiv.appendChild(content);
+
+    chatEl.appendChild(msgDiv);
+    typingMap.set("typing_" + user, msgDiv);
+    scrollToBottom();
+  }
+
+  function processNextLine() {
+    if (index >= lines.length) return;
+
+    const line = lines[index].trim();
+
+    // Формат: DELAY|ТЕКСТ
+    const pipePos = line.indexOf("|");
+    if (pipePos === -1) {
+      // Нет задержки → дефолтная пауза до этого сообщения
+      index++;
+      setTimeout(processNextLine, 500);
+      return;
+    }
+
+    const delayStr = line.slice(0, pipePos).trim();
+    const content = line.slice(pipePos + 1).trim();
+
+    const delay = parseInt(delayStr, 10) || 500;
+
+    // 1. Сначала ждём задержку, относящуюся к *этому* сообщению
+    setTimeout(() => {
+      const firstColon = content.indexOf(":");
+      if (firstColon === -1) {
+        index++;
+        processNextLine();
+        return;
+      }
+
+      const prefix = content.slice(0, firstColon).trim();
+      const text = content.slice(firstColon + 1).trim();
+
+      if (prefix === "СИСТЕМА") {
+        appendMessage(null, text, false, "system");
+        index++;
+        processNextLine(); // дальше без задержки (пауза уже была в таймере)
+
+      } else if (prefix === "ПЕЧАТЬ") {
+        addTyping(text);
+        index++;
+        setTimeout(() => {
+          removeTyping(text);
+          processNextLine();
+        }, 1000 + Math.random() * 3000); // длительность самого индикатора
+
+      } else {
+        const sender = members.find(m => m.name === prefix);
+        const isOwn = sender && sender.isYou;
+
+        appendMessage(prefix, text, isOwn, "regular");
+        index++;
+        processNextLine();
+      }
+    }, delay);
+  }
+  processNextLine();
+}
+
+    runBtn.addEventListener("click", () => {
+      initSounds();
+      startScenario();
+    });
+    restartBtn.addEventListener("click", () => {
+      initSounds();
+      startScenario();
+    });
+    clearBtn.addEventListener("click", clearChat);
+
+    mainContainer.addEventListener("click", () => {
+      initSounds();
+    });
+    mainContainer.addEventListener("touchstart", () => {
+      initSounds();
+    });
+    mainContainer.addEventListener("mousedown", () => {
+      initSounds();
+    });
+
+    function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      initSounds();
+      appendMessage(you.name, text, true);
+      inputEl.value = "";
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    scrollToBottom();
+  </script>
 </body>
 </html>
